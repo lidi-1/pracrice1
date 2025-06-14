@@ -1,0 +1,66 @@
+#include <iostream>
+#include <vector
+#include <unordered_set
+#include <queue>
+#include <string>
+
+using namespace std;
+
+public class Solution
+
+int openLock(vector<string>& deadends, string target)
+We will employ a set for quick deadend lookups
+unordered_set<string> dead(deadends.begin(), deadends.end());
+
+// If the initial point of departure is dead, no progress can be made
+if (dead.count("0000")) return -1;
+
+If the target is the point of origin
+if (target == "0000") return 0;
+
+We will use BFS to discover the shortest path to the target
+queue<string> q
+static unordered_set<string
+
+q.push("0000");
+visited.insert("0000");
+int moves = 0;
+
+While (not q.empty())
+
+int levelSize = q.size(); moves++;
+// Every level in BFS is one move 
+for (int i = 0; i < levelSize; i++) {
+string current = q.front(); 
+q.pop;
+ // Try all 8 possible wheel moves
+                for (int j = 0; j < 4; ++j) {
+                    string up = current;
+                    string down = current;
+
+                    // Turn wheel one step up
+                    up[j] = (up[j] == '9') ? '0' : up[j] + 1;
+
+                    // Turn wheel one step down
+                    down[j] = (down[j] == '0') ? '9' : down[j] - 1;
+
+                    // Check both new combinations
+                    if (up == target || down == target) return moves;
+
+                    if (!dead.count(up) && !visited.count(up)) {
+                        visited.insert(up);
+                        q.push(up);
+                    }
+
+                    if (!dead.count(down) && !visited.count(down)) {
+                        visited.insert(down);
+                        q.push(down);
+                    }
+                }
+            }
+        }
+
+        // If we never reached the target
+        return -1;
+    }
+};
