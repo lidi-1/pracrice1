@@ -1,0 +1,81 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <unordered_map>
+#include <unordered_set>
+
+using namespace std;
+
+class Solution {
+public:
+    int numBusesToDestination(vector<vector<int>>& routes, int source, int target) {
+        // If you're already at the destination, no bus needed
+        if (source == target) return 0;
+
+        // Map to connect each bus stop to all the routes (buses) that pass through it
+        unordered_map<int, vector<int>> stopToRoutes;
+
+        int totalRoutes = routes.size();
+
+        for (int routeIndex = 0; routeIndex < totalRoutes; routeIndex++) {
+            for (int stop : routes[routeIndex]) {
+                stopToRoutes[stop].push_back(routeIndex);
+            }
+        }
+
+        // Queue to perform BFS on the routes
+        queue<int> bfsQueue;
+
+        // To track whether a route has already been used
+        vector<bool> usedRoute(totalRoutes, false);
+
+        // To keep track of all stops we've visited
+        unordered_set<int> visitedStops;
+
+        // Start with all routes that include the source stop
+        for (int route : stopToRoutes[source]) {
+            bfsQueue.push(route);
+            usedRoute[route] = true;
+        }
+
+        // This counts how many buses we've taken so far
+        int busesUsed = 1;
+
+        // Begin BFS
+        while (!bfsQueue.empty()) {
+            int levelSize = bfsQueue.size();
+
+            for (int i = 0; i < levelSize; ++i) {
+                int currentRoute = bfsQueue.front();
+                bfsQueue.pop();
+
+                // Go through each stop in the current route
+                for (int stop : routes[currentRoute]) {
+                    // If this stop is our destination, return the number of buses taken
+                    if (stop == target) {
+                        return busesUsed;
+                    }
+
+                    // Only process stops we haven't already visited
+                    if (visitedStops.find(stop) == visitedStops.end()) {
+                        visitedStops.insert(stop);
+
+                        // Add all the routes through this stop to our search queue
+                        for (int nextRoute : stopToRoutes[stop]) {
+                            if (!usedRoute[nextRoute]) {
+                                usedRoute[nextRoute] = true;
+                                bfsQueue.push(nextRoute);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // We finished exploring one level (one bus ride), so we increment
+            busesUsed++;
+        }
+
+        // If we never reached the destination, return -1
+        return -1;
+    }
+};
