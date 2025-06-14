@@ -1,0 +1,60 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+
+using namespace std;
+
+class Solution {
+public:
+    vector<vector<int>> updateMatrix(vector<vector<int>>& mat) {
+        // Get how many rows and columns the matrix has
+        int rows = mat.size();
+        int cols = mat[0].size();
+
+        // We'll store the final answer here. Start with -1 everywhere to mean "unvisited"
+        vector<vector<int>> result(rows, vector<int>(cols, -1));
+
+        // Queue for BFS. We'll use it to process all water cells (cells with 0)
+        queue<pair<int, int>> q;
+
+        // First step: go through the matrix and find all 0s (water)
+        // These are our starting points since they're already at distance 0
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (mat[i][j] == 0) {
+                    result[i][j] = 0;
+                    q.push({i, j}); // start BFS from here
+                }
+            }
+        }
+
+        // Directions: up, down, left, right
+        int dRow[] = {-1, 1, 0, 0};
+        int dCol[] = {0, 0, -1, 1};
+
+        // Now we'll run a BFS to fill out distances to the nearest 0 for each 1
+        while (!q.empty()) {
+            pair<int, int> curr = q.front();
+            q.pop();
+            int r = curr.first;
+            int c = curr.second;
+
+            // Check each of the 4 directions
+            for (int d = 0; d < 4; d++) {
+                int newR = r + dRow[d];
+                int newC = c + dCol[d];
+
+                // Make sure we don't go out of bounds
+                if (newR >= 0 && newR < rows && newC >= 0 && newC < cols) {
+                    // Only update if this cell hasn't been visited yet
+                    if (result[newR][newC] == -1) {
+                        result[newR][newC] = result[r][c] + 1; // 1 more step from previous
+                        q.push({newR, newC}); // add to queue to process later
+                    }
+                }
+            }
+        }
+
+        return result; // All distances should now be filled
+    }
+};
