@@ -1,0 +1,80 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+
+using namespace std;
+
+class Solution {
+public:
+    int maxDistance(vector<vector<int>>& grid) {
+        // First, we figure out how big the grid is.
+        int numberOfRows = grid.size(); // Since it's a square, this also tells us number of columns.
+
+        // This queue will help us do Breadth-First Search (BFS).
+        // It stores the coordinates (row, column) of each land cell.
+        queue<pair<int, int>> cellsToVisit;
+
+        // Step 1: We go through every cell and find all the land cells.
+        for (int row = 0; row < numberOfRows; row++) {
+            for (int column = 0; column < numberOfRows; column++) {
+                if (grid[row][column] == 1) {
+                    // If it's land, we add it to the BFS queue.
+                    cellsToVisit.push({row, column});
+                }
+            }
+        }
+
+        // Step 2: Check if we have only land or only water.
+        // If yes, then there's no meaningful distance to calculate.
+        if (cellsToVisit.empty() || cellsToVisit.size() == numberOfRows * numberOfRows) {
+            return -1;
+        }
+
+        // Step 3: Define directions we can move: up, down, left, right.
+        int rowChanges[4] = {-1, 1, 0, 0};
+        int columnChanges[4] = {0, 0, -1, 1};
+
+        // We'll use this variable to keep track of the farthest distance we find.
+        int maximumDistance = -1;
+
+        // Step 4: Now we do BFS from all land cells at the same time.
+        // This way, each water cell is filled with the distance from the nearest land.
+        while (!cellsToVisit.empty()) {
+            // Get the current cell from the front of the queue.
+            pair<int, int> currentCell = cellsToVisit.front();
+            cellsToVisit.pop();
+
+            int currentRow = currentCell.first;
+            int currentColumn = currentCell.second;
+
+            // Try moving in all four directions from the current cell.
+            for (int direction = 0; direction < 4; direction++) {
+                int nextRow = currentRow + rowChanges[direction];
+                int nextColumn = currentColumn + columnChanges[direction];
+
+                // Check if the new cell is inside the grid.
+                if (nextRow >= 0 && nextRow < numberOfRows &&
+                    nextColumn >= 0 && nextColumn < numberOfRows) {
+                    
+                    // If this new cell is water and hasn’t been visited yet...
+                    if (grid[nextRow][nextColumn] == 0) {
+                        // Set its value to be one more than the current cell (distance from land).
+                        grid[nextRow][nextColumn] = grid[currentRow][currentColumn] + 1;
+
+                        // Update the maximum distance we’ve seen so far.
+                        int distanceFromLand = grid[nextRow][nextColumn] - 1;
+                        if (distanceFromLand > maximumDistance) {
+                            maximumDistance = distanceFromLand;
+                        }
+
+                        // Add this cell to the queue so we can check its neighbors too.
+                        cellsToVisit.push({nextRow, nextColumn});
+                    }
+                }
+            }
+        }
+
+        // Step 5: When we’re done with BFS, we return the maximum distance we found.
+        return maximumDistance;
+    }
+};
