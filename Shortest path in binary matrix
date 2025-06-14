@@ -1,0 +1,60 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <utility>
+
+using namespace std;
+
+class Solution {
+public:
+    int shortestPathBinaryMatrix(vector<vector<int>>& grid) {
+        int gridSize = grid.size();
+
+        // Early exit if start or end is blocked
+        if (grid[0][0] != 0 || grid[gridSize - 1][gridSize - 1] != 0) {
+            return -1;
+        }
+
+        // Directions for moving in 8 ways (including diagonals)
+        int rowDir[] = { -1, -1, -1, 0, 0, 1, 1, 1 };
+        int colDir[] = { -1, 0, 1, -1, 1, -1, 0, 1 };
+
+        // Create a queue to hold cells to visit next
+        queue<pair<int, int>> bfsQueue;
+        bfsQueue.push({0, 0});
+        
+        // Distance matrix to keep track of steps taken
+        vector<vector<int>> steps(gridSize, vector<int>(gridSize, -1));
+        steps[0][0] = 1;
+
+        while (!bfsQueue.empty()) {
+            pair<int, int> current = bfsQueue.front();
+            bfsQueue.pop();
+
+            int currRow = current.first;
+            int currCol = current.second;
+
+            // Check if we've reached the destination cell
+            if (currRow == gridSize - 1 && currCol == gridSize - 1) {
+                return steps[currRow][currCol];
+            }
+
+            // Try all 8 directions
+            for (int dir = 0; dir < 8; ++dir) {
+                int nextRow = currRow + rowDir[dir];
+                int nextCol = currCol + colDir[dir];
+
+                // Check if next position is inside the grid and is a free cell
+                if (nextRow >= 0 && nextRow < gridSize && nextCol >= 0 && nextCol < gridSize) {
+                    if (grid[nextRow][nextCol] == 0 && steps[nextRow][nextCol] == -1) {
+                        steps[nextRow][nextCol] = steps[currRow][currCol] + 1;
+                        bfsQueue.push({nextRow, nextCol});
+                    }
+                }
+            }
+        }
+
+        // If we couldn't reach the bottom-right cell
+        return -1;
+    }
+};
