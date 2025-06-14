@@ -1,0 +1,66 @@
+#include <iostream>
+#include <queue>
+#include <unordered_set>
+#include <string>
+
+using namespace std;
+
+class Solution {
+public:
+    int racecar(int target) {
+        // Each state: position and speed of the car
+        // We will use BFS to find the shortest sequence of instructions
+        // The instructions are 'A' for accelerate and 'R' for reverse
+        
+        // We'll store states as a tuple: (position, speed)
+        // And also keep track of how many instructions we've used so far
+        
+        // Queue for BFS: stores (position, speed, steps)
+        queue<tuple<int, int, int>> bfsQueue;
+        
+        // Set to keep track of visited states to avoid infinite loops
+        unordered_set<string> visitedStates;
+        
+        // Start at position 0 with speed +1, steps = 0
+        bfsQueue.push({0, 1, 0});
+        visitedStates.insert("0,1"); // store as "pos,speed"
+        
+        while (!bfsQueue.empty()) {
+            auto [currentPosition, currentSpeed, steps] = bfsQueue.front();
+            bfsQueue.pop();
+            
+            // If we have reached the target position, return the steps taken
+            if (currentPosition == target) {
+                return steps;
+            }
+            
+            // 1) Instruction 'A' - accelerate:
+            // Move forward by current speed, then speed doubles
+            int nextPosition = currentPosition + currentSpeed;
+            int nextSpeed = currentSpeed * 2;
+            string stateA = to_string(nextPosition) + "," + to_string(nextSpeed);
+            
+            // Only add the new state if it is within a reasonable bound and not visited before
+            // The bounds avoid infinite exploration
+            if (abs(nextPosition) <= 2 * target && visitedStates.find(stateA) == visitedStates.end()) {
+                bfsQueue.push({nextPosition, nextSpeed, steps + 1});
+                visitedStates.insert(stateA);
+            }
+            
+            // 2) Instruction 'R' - reverse:
+            // If speed is positive, change speed to -1 (reverse direction)
+            // Otherwise, change speed to +1
+            int reversedSpeed = (currentSpeed > 0) ? -1 : 1;
+            string stateR = to_string(currentPosition) + "," + to_string(reversedSpeed);
+            
+            // Add reversed state only if not visited before
+            if (visitedStates.find(stateR) == visitedStates.end()) {
+                bfsQueue.push({currentPosition, reversedSpeed, steps + 1});
+                visitedStates.insert(stateR);
+            }
+        }
+        
+        // If somehow target is unreachable, though problem guarantees it can be reached
+        return -1;
+    }
+};
