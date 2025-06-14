@@ -1,0 +1,50 @@
+#include <iostream>
+#include <utility>
+using namespace std;
+
+/**
+ * Definition for a binary tree node.
+ */
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+};
+
+class Solution {
+public:
+    // Helper function that returns both depth and LCA node
+    pair<int, TreeNode*> findDeepest(TreeNode* node) {
+        if (node == nullptr) {
+            // Base case: if the node is null, depth is 0 and there's no LCA
+            return {0, nullptr};
+        }
+
+        // Recursively compute depth and LCA for left and right subtrees
+        pair<int, TreeNode*> leftResult = findDeepest(node->left);
+        pair<int, TreeNode*> rightResult = findDeepest(node->right);
+
+        int leftDepth = leftResult.first;
+        int rightDepth = rightResult.first;
+
+        // If left subtree is deeper, LCA stays in the left
+        if (leftDepth > rightDepth) {
+            return {leftDepth + 1, leftResult.second};
+        }
+        // If right subtree is deeper, LCA stays in the right
+        else if (rightDepth > leftDepth) {
+            return {rightDepth + 1, rightResult.second};
+        }
+        // If both depths are equal, current node is the LCA
+        else {
+            return {leftDepth + 1, node};
+        }
+    }
+
+    // Main function to find LCA of the deepest leaves
+    TreeNode* lcaDeepestLeaves(TreeNode* root) {
+        return findDeepest(root).second;
+    }
+};
