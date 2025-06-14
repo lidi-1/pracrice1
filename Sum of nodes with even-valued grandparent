@@ -1,0 +1,36 @@
+#include <iostream>
+using namespace std;
+
+// Definition for a binary tree node.
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+};
+
+class Solution {
+public:
+    // Public method to start DFS traversal
+    int sumEvenGrandparent(TreeNode* root) {
+        return dfs(root, nullptr, nullptr);
+    }
+
+private:
+    // DFS helper function that keeps track of parent and grandparent nodes
+    int dfs(TreeNode* node, TreeNode* parent, TreeNode* grandparent) {
+        if (!node) return 0;
+
+        int sum = 0;
+        // If grandparent exists and its value is even, add current node's value
+        if (grandparent && grandparent->val % 2 == 0) {
+            sum += node->val;
+        }
+
+        // Recur for left and right children, shifting parent and grandparent accordingly
+        sum += dfs(node->left, node, parent);
+        sum += dfs(node->right, node, parent);
+
+        return sum;
+    }
+};
