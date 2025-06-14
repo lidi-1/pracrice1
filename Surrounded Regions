@@ -1,0 +1,50 @@
+#include <vector>
+#include <functional>
+using namespace std;
+
+class Solution {
+public:
+    void solve(vector<vector<char>>& board) {
+        int rows = board.size();
+        if (rows == 0) return;
+        int cols = board[0].size();
+
+        // DFS to mark 'O's connected to the border as safe by temporarily marking them '#'
+        function<void(int, int)> markSafe = [&](int r, int c) {
+            // Check boundaries and if current cell is 'O'
+            if (r < 0 || r >= rows || c < 0 || c >= cols || board[r][c] != 'O') 
+                return;
+
+            // Mark current cell as safe
+            board[r][c] = '#';
+
+            // Explore all 4 directions (up, down, left, right)
+            markSafe(r + 1, c);
+            markSafe(r - 1, c);
+            markSafe(r, c + 1);
+            markSafe(r, c - 1);
+        };
+
+        // Step 1: Run DFS for all 'O's on the borders to mark safe regions
+        for (int i = 0; i < rows; ++i) {
+            markSafe(i, 0);          // Left border
+            markSafe(i, cols - 1);   // Right border
+        }
+        for (int j = 0; j < cols; ++j) {
+            markSafe(0, j);          // Top border
+            markSafe(rows - 1, j);   // Bottom border
+        }
+
+        // Step 2: Flip all remaining 'O's (which are surrounded) to 'X'
+        // and revert '#' (safe) back to 'O'
+        for (int r = 0; r < rows; ++r) {
+            for (int c = 0; c < cols; ++c) {
+                if (board[r][c] == 'O') {
+                    board[r][c] = 'X';  // Captured region
+                } else if (board[r][c] == '#') {
+                    board[r][c] = 'O';  // Safe region, revert back
+                }
+            }
+        }
+    }
+};
