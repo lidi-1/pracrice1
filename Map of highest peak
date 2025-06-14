@@ -1,0 +1,64 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+
+using namespace std;
+
+class Solution {
+public:
+    vector<vector<int>> highestPeak(vector<vector<int>>& isWater) {
+        // Get the number of rows and columns in the grid
+        int m = isWater.size();
+        int n = isWater[0].size();
+
+        // We'll store final height values here. Start everything as -1.
+        vector<vector<int>> height(m, vector<int>(n, -1));
+
+        // BFS queue. We'll start from all the water cells.
+        queue<pair<int, int>> q;
+
+        // First, let's find all the water cells (they get height 0)
+        for (int row = 0; row < m; ++row) {
+            for (int col = 0; col < n; ++col) {
+                if (isWater[row][col] == 1) {
+                    height[row][col] = 0; // water starts at height 0
+                    q.push({row, col});   // add it to the queue to begin BFS
+                }
+            }
+        }
+
+        // Directions to go up, down, left, right
+        int dx[4] = {0, 0, 1, -1};
+        int dy[4] = {1, -1, 0, 0};
+
+        // Start the BFS process
+        while (!q.empty()) {
+            pair<int, int> current = q.front();
+            q.pop();
+
+            int x = current.first;
+            int y = current.second;
+            int currHeight = height[x][y];
+
+            // Try moving in all 4 directions from current cell
+            for (int i = 0; i < 4; ++i) {
+                int newX = x + dx[i];
+                int newY = y + dy[i];
+
+                // Check if the new position is valid and hasn't been visited yet
+                if (newX >= 0 && newX < m && newY >= 0 && newY < n) {
+                    if (height[newX][newY] == -1) {
+                        // Set the height for this land cell
+                        height[newX][newY] = currHeight + 1;
+
+                        // Push the new cell into the queue so we can expand from there too
+                        q.push({newX, newY});
+                    }
+                }
+            }
+        }
+
+        // Return the completed height map
+        return height;
+    }
+};
