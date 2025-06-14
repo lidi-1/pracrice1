@@ -1,0 +1,44 @@
+#include <iostream>
+#include <vector>
+#include <stack>
+
+using namespace std;
+
+class Solution {
+public:
+    bool canVisitAllRooms(vector<vector<int>>& rooms) {
+        int totalRooms = rooms.size();
+
+        // Let's track which rooms we've already opened
+        vector<bool> visited(totalRooms, false);
+        visited[0] = true; // Room 0 is always unlocked
+
+        // We'll use a stack for DFS (you can also use a queue for BFS)
+        stack<int> toVisit;
+        toVisit.push(0);
+
+        // Go through all accessible rooms
+        while (!toVisit.empty()) {
+            int currentRoom = toVisit.top();
+            toVisit.pop();
+
+            // Check all keys found in this room
+            for (int key : rooms[currentRoom]) {
+                // If we haven't visited the room yet, mark it and explore later
+                if (!visited[key]) {
+                    visited[key] = true;
+                    toVisit.push(key);
+                }
+            }
+        }
+
+        // Now let's check if all rooms were eventually visited
+        for (bool hasVisited : visited) {
+            if (!hasVisited) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+};
