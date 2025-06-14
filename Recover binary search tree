@@ -1,0 +1,58 @@
+#include <iostream>
+using namespace std;
+
+/**
+ * Definition for a binary tree node.
+ */
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+};
+
+class Solution {
+private:
+    TreeNode* firstMisplaced = nullptr;   // First node that’s out of order
+    TreeNode* secondMisplaced = nullptr;  // Second node that’s out of order
+    TreeNode* previousNode = nullptr;     // Keeps track of the previously visited node
+
+    // Recursive in-order traversal to detect misplaced nodes
+    void inOrderTraversal(TreeNode* currentNode) {
+        if (currentNode == nullptr) {
+            return;
+        }
+
+        // Visit the left subtree
+        inOrderTraversal(currentNode->left);
+
+        // If the previous node's value is greater than the current, it's an anomaly
+        if (previousNode != nullptr && previousNode->val > currentNode->val) {
+            // First time we find a pair in the wrong order
+            if (firstMisplaced == nullptr) {
+                firstMisplaced = previousNode;
+            }
+            // Always update second to current (in case of adjacent or non-adjacent swap)
+            secondMisplaced = currentNode;
+        }
+
+        // Move forward in the in-order traversal
+        previousNode = currentNode;
+
+        // Visit the right subtree
+        inOrderTraversal(currentNode->right);
+    }
+
+public:
+    // Main function to fix the tree
+    void recoverTree(TreeNode* root) {
+        // Run in-order traversal to identify the two swapped nodes
+        inOrderTraversal(root);
+
+        // If we found two nodes to fix, swap their values
+        if (firstMisplaced != nullptr && secondMisplaced != nullptr) {
+            swap(firstMisplaced->val, secondMisplaced->val);
+        }
+    }
+};
