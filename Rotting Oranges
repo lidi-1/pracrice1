@@ -1,0 +1,84 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+
+using namespace std;
+
+class Solution {
+public:
+    int orangesRotting(vector<vector<int>>& grid) {
+        // Get the size of the grid
+        int rows = grid.size();
+        int cols = grid[0].size();
+
+        // Queue to perform BFS - stores the position of rotten oranges
+        queue<pair<int, int>> bfsQueue;
+
+        // Count of fresh oranges we need to track
+        int freshCount = 0;
+
+        // Step 1: Initialize the queue with all rotten oranges
+        // and count the total number of fresh oranges
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < cols; ++j) {
+                if (grid[i][j] == 2) {
+                    bfsQueue.push({i, j});  // Rotten orange
+                } else if (grid[i][j] == 1) {
+                    freshCount++;  // Fresh orange
+                }
+            }
+        }
+
+        // If there are no fresh oranges to rot, we're done
+        if (freshCount == 0) {
+            return 0;
+        }
+
+        // Define the 4 directions: right, down, left, up
+        vector<pair<int, int>> directions = {
+            {0, 1}, {1, 0}, {0, -1}, {-1, 0}
+        };
+
+        int minutesPassed = 0;
+
+        // Step 2: Perform BFS to rot the neighboring fresh oranges
+        while (!bfsQueue.empty()) {
+            int currentLevelSize = bfsQueue.size();
+            bool anyRottingHappened = false;
+
+            for (int i = 0; i < currentLevelSize; ++i) {
+                pair<int, int> rotten = bfsQueue.front();
+                bfsQueue.pop();
+
+                int row = rotten.first;
+                int col = rotten.second;
+
+                // Try to rot neighboring cells
+                for (auto dir : directions) {
+                    int newRow = row + dir.first;
+                    int newCol = col + dir.second;
+
+                    // Make sure the new cell is inside the grid and has a fresh orange
+                    if (newRow >= 0 && newRow < rows &&
+                        newCol >= 0 && newCol < cols &&
+                        grid[newRow][newCol] == 1) {
+
+                        // Rot the fresh orange
+                        grid[newRow][newCol] = 2;
+                        bfsQueue.push({newRow, newCol});
+                        freshCount--;
+                        anyRottingHappened = true;
+                    }
+                }
+            }
+
+            // Only increment time if at least one orange rotted this round
+            if (anyRottingHappened) {
+                minutesPassed++;
+            }
+        }
+
+        // If there are still fresh oranges left, return -1
+        return (freshCount == 0) ? minutesPassed : -1;
+    }
+};
