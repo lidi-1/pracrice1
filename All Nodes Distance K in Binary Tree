@@ -1,0 +1,52 @@
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+
+#include <vector>
+#include <unordered_map>
+#include <unordered_set>
+#include <queue>
+
+using namespace std;
+
+class Solution {
+public:
+    // Helper function to turn the tree into an undirected graph
+    void buildGraph(TreeNode* current, TreeNode* parent, unordered_map<int, vector<int>>& graph) {
+        if (current == nullptr) return;
+
+        // If the current node has a parent, connect them both ways in the graph
+        if (parent != nullptr) {
+            graph[current->val].push_back(parent->val);
+            graph[parent->val].push_back(current->val);
+        }
+
+        // Recur for left and right children
+        buildGraph(current->left, current, graph);
+        buildGraph(current->right, current, graph);
+    }
+
+    vector<int> distanceK(TreeNode* root, TreeNode* target, int k) {
+        unordered_map<int, vector<int>> graph;
+
+        // Step 1: Convert the binary tree into an undirected graph
+        buildGraph(root, nullptr, graph);
+
+        // Step 2: Use BFS starting from the target node's value
+        queue<int> bfsQueue;
+        unordered_set<int> visited;
+
+        bfsQueue.push(target->val);
+        visited.insert(target->val);
+
+        int currentDistance = 0;
+
+        // Run BFS until we reach distance k
+        while (!bfsQueue.empty()) {
+            int levelSize = bfsQueue.size();
