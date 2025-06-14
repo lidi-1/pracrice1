@@ -1,0 +1,47 @@
+/*
+// Definition for Employee.
+// class Employee {
+// public:
+//     int id;
+//     int importance;
+//     vector<int> subordinates;
+// };
+*/
+
+#include <unordered_map>
+#include <vector>
+
+using namespace std;
+
+class Solution {
+public:
+    // This map will help us quickly find an employee by their ID
+    unordered_map<int, Employee*> employeeTable;
+
+    int getImportance(vector<Employee*> employees, int id) {
+        // Step 1: Fill the map with employee ID as key and pointer to Employee as value
+        for (Employee* emp : employees) {
+            employeeTable[emp->id] = emp;
+        }
+
+        // Step 2: Start calculating importance using DFS
+        return calculateImportance(id);
+    }
+
+private:
+    // Helper function to compute total importance recursively
+    int calculateImportance(int employeeId) {
+        // Look up the employee using the ID
+        Employee* emp = employeeTable[employeeId];
+
+        // Start with their own importance
+        int totalImportance = emp->importance;
+
+        // Add the importance of all their subordinates
+        for (int subId : emp->subordinates) {
+            totalImportance += calculateImportance(subId);
+        }
+
+        return totalImportance;
+    }
+};
