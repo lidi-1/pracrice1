@@ -1,0 +1,62 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <unordered_set>
+#include <string>
+
+using namespace std;
+
+class Solution {
+public:
+    int ladderLength(string beginWord, string endWord, vector<string>& wordList) {
+        // Convert the word list into a set for faster lookup
+        unordered_set<string> dictionary(wordList.begin(), wordList.end());
+
+        // If the end word isn't in the dictionary, there's no valid path
+        if (dictionary.find(endWord) == dictionary.end()) {
+            return 0;
+        }
+
+        // Queue to perform BFS: each item is a word and the number of steps taken to reach it
+        queue<pair<string, int>> bfsQueue;
+        bfsQueue.push({beginWord, 1});  // Start with the beginWord and 1 step
+
+        // Start BFS
+        while (!bfsQueue.empty()) {
+            auto current = bfsQueue.front();
+            bfsQueue.pop();
+
+            string currentWord = current.first;
+            int steps = current.second;
+
+            // If we found the endWord, return how many steps it took
+            if (currentWord == endWord) {
+                return steps;
+            }
+
+            // Try changing each letter of the word
+            for (int i = 0; i < currentWord.length(); ++i) {
+                char originalChar = currentWord[i];
+
+                // Replace with every letter from a to z
+                for (char ch = 'a'; ch <= 'z'; ++ch) {
+                    if (ch == originalChar) continue;  // No need to replace with the same letter
+
+                    currentWord[i] = ch;
+
+                    // If the new word is in the dictionary, it's a valid transformation
+                    if (dictionary.find(currentWord) != dictionary.end()) {
+                        bfsQueue.push({currentWord, steps + 1});
+                        dictionary.erase(currentWord);  // Mark as visited by removing it
+                    }
+                }
+
+                // Restore the original character before moving to the next position
+                currentWord[i] = originalChar;
+            }
+        }
+
+        // If no transformation chain reaches the end word
+        return 0;
+    }
+};
