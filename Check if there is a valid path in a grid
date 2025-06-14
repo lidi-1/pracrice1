@@ -1,0 +1,27 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <unordered_map>
+#include <utility>
+#include <functional>
+#include <algorithm>
+
+using namespace std;
+
+class Solution {
+public:
+    bool hasValidPath(vector<vector<int>>& grid) {
+        int rows = grid.size();
+        int cols = grid[0].size();
+
+        // Define valid directions for each street type
+        unordered_map<int, vector<pair<int, int>>> streetDirections = {
+            {1, {{0, -1}, {0, 1}}},   // Horizontal street: left and right
+            {2, {{-1, 0}, {1, 0}}},   // Vertical street: up and down
+            {3, {{0, -1}, {1, 0}}},   // Connects left and down
+            {4, {{0, 1}, {1, 0}}},    // Connects right and down
+            {5, {{0, -1}, {-1, 0}}},  // Connects left and up
+            {6, {{0, 1}, {-1, 0}}}    // Connects right and up
+        };
+
+        // A helper map to check if the
