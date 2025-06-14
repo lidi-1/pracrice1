@@ -1,0 +1,59 @@
+#include <vector>
+#include <functional>
+using namespace std;
+
+class Solution {
+public:
+    vector<vector<char>> updateBoard(vector<vector<char>>& board, vector<int>& click) {
+        int rows = board.size();
+        int cols = board[0].size();
+        int clickRow = click[0];
+        int clickCol = click[1];
+        
+        // If the clicked cell is a mine, mark it as 'X' (game over) and return the board immediately
+        if (board[clickRow][clickCol] == 'M') {
+            board[clickRow][clickCol] = 'X';
+            return board;
+        }
+        
+        // Define a recursive DFS function to reveal cells
+        function<void(int, int)> reveal = [&](int row, int col) {
+            // Boundary checks and check if the cell is already revealed or not empty
+            if (row < 0 || row >= rows || col < 0 || col >= cols || board[row][col] != 'E')
+                return;
+
+            // Count how many mines surround this cell
+            int mineCount = 0;
+            for (int dr = -1; dr <= 1; ++dr) {
+                for (int dc = -1; dc <= 1; ++dc) {
+                    if (dr == 0 && dc == 0) continue; // Skip the current cell itself
+                    int newRow = row + dr;
+                    int newCol = col + dc;
+                    if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols && board[newRow][newCol] == 'M') {
+                        ++mineCount;
+                    }
+                }
+            }
+            
+            if (mineCount > 0) {
+                // If there are adjacent mines, reveal the count as a digit character
+                board[row][col] = '0' + mineCount;
+            } else {
+                // If no adjacent mines, mark as 'B' and reveal all neighbors recursively
+                board[row][col] = 'B';
+                for (int dr = -1; dr <= 1; ++dr) {
+                    for (int dc = -1; dc <= 1; ++dc) {
+                        if (dr == 0 && dc == 0) continue;
+                        reveal(row + dr, col + dc);
+                    }
+                }
+            }
+        };
+        
+        // Start revealing from the clicked cell
+        reveal(clickRow, clickCol);
+        
+        // Return the updated board after the reveal process
+        return board;
+    }
+};
